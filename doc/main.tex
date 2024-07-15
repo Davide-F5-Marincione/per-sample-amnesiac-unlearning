@@ -47,7 +47,7 @@ Our work consists of:
 As far as single-technique driven methods go (as combined procedures are often used in practice), the \emph{model shifting} \cite{xu2023survey} family of techniques is one of the most promising. These techniques are based on the idea of directly updating the model parameters to offset the impact of the samples to forget; by finding an update $\delta$ for $w_u=w+\delta$, where $w$ are the parameters of the original model. The reason for why this solution is so promising is that it does not require a major retraining of the model, which is often infeasible for big models: both in terms of time and computational resources.
 
 One of the most successful \emph{model shifting} techniques is Amnesiac Unlearning \cite{graves2021amnesiac}, which defines the update $\delta$ with the gradient updates in which the samples to forget took part. To do so, the gradient update of each batch must be stored on disk, leading to a high memory requirement, as each update is of the same size as the model. This is a major drawback, as it makes the technique unfeasible for big models.
-An extremely recent work \cite{gogineni2024efficient} proposes an approximation which only stores a random subset of the gradients in the update, therefore reducing the memory requirements. However, this leads to a decrease in the effectiveness of the technique, which requires a short retraining phase to completely forget the samples.
+An extremely recent work \cite{gogineni2024efficient} proposes layer unlearning, an approximation which only stores a random subset of the gradients in the update, therefore reducing the memory requirements. However, this leads to a decrease in the effectiveness of the technique, which requires a short retraining phase to completely forget the samples.
 
 \section{Method}
 Our method consists of storing the gradients not for each batch, but for each sample. On the long run, this leads to a lower memory requirement than the original technique, as we only need to store a single set of gradients for each sample (rather than a new set for each batch). If the space requirements of the original technique are $O(\frac{NME}{B})$, our technique requires $O(NMp)$ space, where $N$ is the number of samples in the dataset, $E$ is the number of epochs, $B$ is the batch size, $M$ is the number of parameters in the model, and $p$ is percentage of parameters kept in the random subset. It is easy to see that our method requires less space than the original technique if $p<\frac{E}{B}$ (which can be easily achieved in practice, as if we heuristically set $p=.1$ and have a typical $B=64$ then we just require $E=7$).
@@ -58,7 +58,24 @@ Not only can our method require less space than the original, but it also has th
 
 Our implementation slightly differs from the original: in that, they store the difference between the model before and after the gradient update, making it invariant to the choice of optimizer. Our case instead, since \texttt{pytorch} allows the calculation of per-sample gradients through \texttt{call\_for\_per\_sample\_grads} but not the usage of its result through an optimizer, we had to directly store the gradients, and not the difference between the model before and after the update. This implies that, since optimization usually doesn't directly remove the gradients during a step, but instead uses some value derived from it (either the same gradient but with lower magnitude or an exponential moving average of the gradients), our implementation is not invariant to the choice of optimizer. Still, as in the original technique, we trained the model with \texttt{Adam} and nonetheless we achieved comparable results, therefore we believe this to not be a drawback.
 
-We test our method on MNIST and CIFAR-100, both with a small CNN and a ResNet-18; during all tests, we empirically set $p=.1$ and run the training for $4$ epochs (the maximum amount of epochs that the original technique can run with the available memory on a Kaggle Notebook). From these tests, we see that our technique enjoys a similar effectiveness to the original, as it requires no retraining to completely forget the samples. Furthermore, we make multiple runs with different values of $p$ to find the lowest value that still allows the technique to work.
+\begin{table}
+\centering
+\caption{Results on MNIST with a small CNN, forgetting class $3$. Results are the accuracy of the forgotten class and of the rest of the dataset (in the form 'forgotten/rest')}
+\label{tab:mnist_small_cnn}
+\begin{tabular}{l | c | c c}
+    Technique&After train&No retrain&After retrain\\
+    \hline
+    Original&$0.58$/$0.98$& $0.00$/$0.84$& $0.00$/$0.98$\\
+    Layer, $p=.1$&$0.87$/$0.98$& $0.44$/$0.98$& $0.10$/$0.98$\\
+    \hline
+    Ours, $p=.1$&$0.61$/$0.98$& $0.00$/$0.84$& $0.04$/$0.98$\\
+    Ours, $p=.075$&$0.80$/$0.98$& $0.00$/$0.92$& $0.00$/$0.99$\\
+    Ours, $p=.05$&$0.82$/$0.98$& $0.35$/$0.97$& $0.09$/$0.98$\\
+    Ours, $p=.01$&$0.74$/$0.98$&$0.51$/$0.97$& $0.02$/$0.98$\\
+\end{tabular}
+\end{table}
+
+We test our method on MNIST and CIFAR-100, both with a small CNN and a ResNet-18; during all tests, we run the training for $4$ epochs (the maximum amount of epochs that the original technique can run with the available memory on a Kaggle Notebook) and the retraining for $4$ epochs too. From these tests, we see that our technique enjoys a similar effectiveness to the original, as it requires no retraining to completely forget the samples. Furthermore, we make multiple runs with different values of $p$ to find the lowest value that still allows the technique to work.
 
 \section{Conclusion}
 We've empirically shown that amnesiac unlearning can be even more powerful if done per-sample rather than per-batch. Furthermore, we can effectively unlearn training samples by modifying just a fraction of the model's parameters. Thanks to these two properties, our technique is shown to be more effective than the approximation proposed in \cite{gogineni2024efficient}, as it requires no retraining. Further work could be done to find the optimal subset of parameters to keep, rather than using a random subset; furthermore, it could be made even more efficient by compressing the representation of the gradients themselves using lower bit precision and other techniques.
