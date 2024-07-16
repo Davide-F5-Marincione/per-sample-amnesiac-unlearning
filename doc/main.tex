@@ -56,11 +56,11 @@ Not only can our method require less space than the original, but it also has th
 
 \section{Experiments} We modify the code provided by the authors of \cite{graves2021amnesiac} to test our method as well as the original Amnesiac Unlearning technique, and the approximation proposed in \cite{gogineni2024efficient} (as they have yet to publish their own code).
 
-Our implementation slightly differs from the original: in that, they store the difference between the model before and after the gradient update, making it invariant to the choice of optimizer. Our case instead, since \texttt{pytorch} allows the calculation of per-sample gradients through \texttt{call\_for\_per\_sample\_grads} but not the usage of its result through an optimizer, we had to directly store the gradients, and not the difference between the model before and after the update. This implies that, since optimization usually doesn't directly remove the gradients during a step, but instead uses some value derived from it (either the same gradient but with lower magnitude or an exponential moving average of the gradients), our implementation is not invariant to the choice of optimizer. Still, as in the original technique, we trained the model with \texttt{Adam} and nonetheless we achieved comparable results, therefore we believe this to not be a drawback.
+Our implementation slightly differs from the original: in that, they store the difference between the model before and after the gradient update, making it invariant to the choice of optimizer. Our case instead, since \texttt{pytorch} allows the calculation of per-sample gradients through \texttt{call\_for\_per\_sample\_grads} but not the usage of its result through an optimizer, we had to directly store the gradients, and not the difference between the model before and after the update. This implies that, since optimization usually doesn't directly remove the gradients during a step, but instead uses some value derived from it (either the same gradient but with lower magnitude or an exponential moving average of the gradients), our implementation is not invariant to the choice of optimizer. Still, as in the original technique, we trained the model with \texttt{Adam} and nonetheless we achieved comparable results, therefore we believe this to not be a drawback. 
 
 \begin{table}
 \centering
-\caption{Results on MNIST with a small CNN, forgetting class of number $3$. Results are the accuracy of the forgotten class and of the rest of the dataset (in the form 'forgotten/rest'). \emph{After train} values are all the same as training is equal for all techniques.}
+\caption{MNIST with a small CNN, forgetting class $3$. Results are the accuracy of the forgotten class and of the rest of the dataset (in the form 'forgotten/rest').}
 \label{tab:mnist_small_cnn}
 \begin{tabular}{l | c | c c}
     Technique&After train&No retrain&After retrain\\
@@ -68,16 +68,16 @@ Our implementation slightly differs from the original: in that, they store the d
     Original&$0.58$/$0.98$& $0.00$/$0.84$& $0.00$/$0.98$\\
     Layer, $p=.1$&$0.87$/$0.98$& $0.44$/$0.98$& $0.10$/$0.98$\\
     \hline
-    Ours, $p=.1$&$0.74$/$0.98$& $0.00$/$0.85$& $0.00$/$0.99$\\
-    Ours, $p=.075$&$0.74$/$0.98$& $0.00$/$0.94$& $0.01$/$0.98$\\
-    Ours, $p=.05$&$0.74$/$0.98$& $0.17$/$0.97$& $0.04$/$0.99$\\
-    Ours, $p=.01$&$0.74$/$0.98$&$0.67$/$0.98$& $0.04$/$0.99$\\
+    Ours, $p=.1$&$0.64$/$0.98$& $0.00$/$0.84$& $0.02$/$0.98$\\
+    Ours, $p=.075$&$0.60$/$0.98$&$0.02$/$0.94$& $0.03$/$0.98$\\
+    Ours, $p=.05$&$0.68$/$0.98$&$0.11$/$0.96$&$0.06$/$0.98$\\
+    Ours, $p=.01$&$0.61$/$0.98$&$0.41$/$0.98$&$0.16$/$0.98$\\
 \end{tabular}
 \end{table}
 
 \begin{table}
     \centering
-    \caption{Results on CIFAR100 with a small CNN, forgetting class $81$.}
+    \caption{CIFAR100 with a small CNN, forgetting class $81$.}
     \label{tab:cifar_small_cnn}
     \begin{tabular}{l | c | c c}
         Technique&After train&No retrain&After retrain\\
@@ -85,14 +85,50 @@ Our implementation slightly differs from the original: in that, they store the d
         Original&-\\
         Layer, $p=.1$&-\\
         \hline
-        Ours, $p=.1$&$0.22$/$0.33$&$0.00$/$0.16$&$0.00$/$0.35$\\
-        Ours, $p=.075$&$0.22$/$0.33$&$0.00$/$0.19$&$0.00$/$0.36$\\
-        Ours, $p=.05$&$0.22$/$0.33$&$0.00$/$0.25$&$0.00$/$0.36$\\
-        Ours, $p=.01$&$0.22$/$0.33$&$0.05$/$0.32$&$0.00$/$0.35$\\
+        Ours, $p=.1$&$0.23$/$0.33$&$0.00$/$0.17$&$0.00$/$0.35$\\
+        Ours, $p=.075$&$0.23$/$0.33$&$0.00$/$0.18$&$0.00$/$0.36$\\
+        Ours, $p=.05$&$0.23$/$0.33$&$0.00$/$0.24$&$0.00$/$0.36$\\
+        Ours, $p=.01$&$0.23$/$0.33$&$0.06$/$0.32$&$0.00$/$0.36$\\
     \end{tabular}
-    \end{table}
+\end{table}
+
+\begin{table}
+    \centering
+    \caption{MNIST with ResNet-18, forgetting class $3$.}
+    \label{tab:mnist_resnet}
+    \begin{tabular}{l | c | c c}
+        Technique&After train&No retrain&After retrain\\
+        \hline
+        Original&-\\
+        Layer, $p=.1$&-\\
+        \hline
+        Ours, $p=.2$&$0.88$/$0.99$&$0.24$/$0.98$&$0.00$/$0.99$\\
+        Ours, $p=.1$&$0.78$/$0.99$&$0.64$/$0.98$&$0.00$/$0.99$\\
+        Ours, $p=.075$&$0.92$/$0.98$&$0.85$/$0.98$&$0.00$/$0.99$\\
+    \end{tabular}
+\end{table}
+
+\begin{table}
+    \centering
+    \caption{CIFAR100 with ResNet-18, forgetting class $81$.}
+    \label{tab:cifar_resnet}
+    \begin{tabular}{l | c | c c}
+        Technique&After train&No retrain&After retrain\\
+        \hline
+        Original&-\\
+        Layer, $p=.1$&-\\
+        \hline
+        Ours, $p=.2$&$0.30$/$0.32$&$0.00$/$0.09$&$0.00$/$0.41$\\
+        Ours, $p=.1$&$0.25$/$0.33$&$0.00$/$0.20$&$0.00$/$0.40$\\
+        Ours, $p=.075$&$0.21$/$0.33$&$0.00$/$0.20$&$0.00$/$0.41$\\
+        Ours, $p=.05$&$0.28$/$0.34$&$0.00$/$0.28$&$0.00$/$0.40$\\
+        Ours, $p=.01$&$0.19$/$0.33$&$0.06$/$0.32$&$0.00$/$0.40$\\
+    \end{tabular}
+\end{table}
 
 We test our method on MNIST and CIFAR-100, both with a small CNN and a ResNet-18; during all tests, we run the training for $4$ epochs (the maximum amount of epochs that the original technique can run with the available memory on a Kaggle Notebook) and the retraining for $4$ epochs too. From these tests, we see that our technique enjoys a similar effectiveness to the original, as it requires no retraining to completely forget the samples. Furthermore, we make multiple runs with different values of $p$ to find the lowest value that still allows the technique to work.
+
+As a note, \texttt{call\_for\_per\_sample\_grads} can't work with \texttt{BatchNorm2d} (as it calculates the normalization on the whole batch), therefore we modified the standard ResNet-18 implementation by replacing each instance with \texttt{GroupNorm}.
 
 \section{Conclusion}
 We've empirically shown that amnesiac unlearning can be even more powerful if done per-sample rather than per-batch. Furthermore, we can effectively unlearn training samples by modifying just a fraction of the model's parameters. Thanks to these two properties, our technique is shown to be more effective than the approximation proposed in \cite{gogineni2024efficient}, as it requires no retraining. Further work could be done to find the optimal subset of parameters to keep, rather than using a random subset; furthermore, it could be made even more efficient by compressing the representation of the gradients themselves using lower bit precision and other techniques.
