@@ -43,8 +43,7 @@ Our work consists of:
     \item A new unlearning technique with lower memory requirements than the original Amnesiac Unlearning \cite{graves2021amnesiac}.
     \item Tests on MNIST and CIFAR-100 showing that our technique can successfully forget whole classes while maintaining performance on the rest of the dataset.
 \end{itemize}
-Code can be found at \url{https://github.com/Davide-F5-Marincione/per-sample-amnesiac-unlearning}{https://github.com/Davide-F5-Marincione/per-sample-amnesiac-unlearning}.
-\vfill
+Code can be found at \url{https://github.com/Davide-F5-Marincione/per-sample-amnesiac-unlearning}.
 
 \section{Related Work}
 As far as single-technique driven methods go (combined procedures are often used in practice), the \emph{model shifting} \cite{xu2023survey} family is one of the most promising. These techniques are based on the idea of directly updating a model's parameters to offset the impact of the samples to forget; by finding an update $\delta$ for $w_u=w+\delta$, where $w$ are the parameters of the original model. %The reason for why this solution is so promising is that it does not require a major retraining of the model, which is often infeasible for big models: both in terms of time and computational resources.
