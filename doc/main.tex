@@ -113,7 +113,7 @@ As a note, we use \texttt{call\_for\_per\_sample\_grads}; which can't work with 
 \end{table}
 
 We test our method on MNIST and CIFAR-100, with a small CNN and a ResNet-18. During all tests, we run the training for $4$ epochs (the maximum epochs that the original technique can run without going OOM on a Kaggle Notebook) and the retraining (without the forgotten data) for $4$ epochs too.
-From these, we see that our technique can roughly achieve the same results of \cite{gogineni2024efficient} with a lower $p$, and that, despite being the more complex dataset, CIFAR-100 is the one where our technique can get more efficient (reaching a lower $p$ while keeping the performance on the forget class low).
+From these, we see that our technique can roughly achieve the same results of \cite{gogineni2024efficient} with a lower $p$, and that, despite being the more complex dataset, CIFAR-100 is the one where our technique can get more efficient (reaching a lower $p$ while keeping the accuracy on the class to forget low).
 
 \begin{table}
     \centering
