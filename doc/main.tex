@@ -36,7 +36,7 @@
 Typical machine unlearning techniques do not scale well with modern deep learning models, as these either require models to abide to strict theoretical guarantees (lowering their effectiveness) or be retrained (unfeasible for big models). In this project we propose a variation of Amnesiac Unlearning, a technique which promises to bring unlearning with little to no compromises to neural networks. Our method lowers the memory requirements of the original technique while maintaining its effectiveness. We test it on MNIST and CIFAR-100, showing that it can make a model forget classes while maintaining its performance on the rest of the dataset.
 \end{abstract}
 \section{Introduction}
-Machine Unlearning is an ever-more important topic in the field of Machine Learning. Not only because privacy concerns regarding deep learning techniques are increasing, but also because regulations such as the EU's GDPR oblige companies to delete user's data at their request. Because of this, research in trying to produce an unlearning procedure that requires the less possible amount of retraining is ongoing.
+Machine unlearning is an ever-more important topic in the field of machine learning. Not only because privacy concerns regarding deep learning techniques are increasing, but also because regulations such as the EU's GDPR oblige companies to delete user's data at their request. Because of this, research in trying to produce an unlearning procedure that requires the less possible amount of retraining is ongoing.
 
 Our work consists of:
 \begin{itemize}
@@ -152,7 +152,7 @@ In \cite{graves2021amnesiac} a Model Inversion Attack \cite{fredrikson2015invers
 \end{figure}
 
 \section{Conclusion}
-We've empirically shown that amnesiac unlearning can be even more powerful if done per-sample rather than per-batch. Furthermore, we can effectively unlearn training samples by modifying just a fraction of the model's parameters. Thanks to these two properties, our technique has the potential to be more effective than the approximation proposed in \cite{gogineni2024efficient}. Further work could be done to find the optimal subset of parameters to keep, rather than using a random subset. One could make it more efficient by compressing the representation of the gradients themselves using lower bit precision and other techniques.
+We've empirically shown that Amnesiac Unlearning can be even more powerful if done per-sample rather than per-batch. Furthermore, we can effectively unlearn training samples by modifying just a fraction of the model's parameters. Thanks to these two properties, our technique has the potential to be more effective than the approximation proposed in \cite{gogineni2024efficient}. Further work could be done to find the optimal subset of parameters to keep, rather than using a random subset, and finally, one could make it more efficient by compressing the representation of the gradients themselves using lower bit precision and other techniques.
 
 \bibliography{references.bib}
 \bibliographystyle{dlai2024}
