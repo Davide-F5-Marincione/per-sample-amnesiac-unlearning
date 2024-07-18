@@ -151,7 +151,7 @@ In \cite{graves2021amnesiac} a Model Inversion Attack \cite{fredrikson2015invers
     \label{fig:inversion}
 \end{figure}
 
-\section{Conclusion}
+\section{Conclusions}
 We've empirically shown that Amnesiac Unlearning can be even more powerful if done per-sample rather than per-batch. Furthermore, we can effectively unlearn training samples by modifying just a fraction of the model's parameters. Thanks to these two properties, our technique has the potential to be more effective than the approximation proposed in \cite{gogineni2024efficient}. Further work could be done to find the optimal subset of parameters to keep, rather than using a random subset, and finally, one could make it more efficient by compressing the representation of the gradients themselves using lower bit precision and other techniques.
 
 \bibliography{references.bib}
